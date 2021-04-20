@@ -770,7 +770,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         canvas.style.background = style
         window.setInterval(function () {
             main()
-        }, 34)
+        }, 17)
         document.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
         });
@@ -822,15 +822,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
         if (typeof object.body != 'undefined') {
             if(typeof (gamepadAPI.axesStatus[1]) != 'undefined'){
                 if(typeof (gamepadAPI.axesStatus[0]) != 'undefined'){
-                object.body.xmom += (gamepadAPI.axesStatus[2] * speed)
-                object.body.ymom += (gamepadAPI.axesStatus[1] * speed)
+                object.body.xmom += (gamepadAPI.axesStatus[2] * speed/5)
+                object.body.ymom += (gamepadAPI.axesStatus[1] * speed/10)
                 }
             }
         } else if (typeof object != 'undefined') {
             if(typeof (gamepadAPI.axesStatus[1]) != 'undefined'){
                 if(typeof (gamepadAPI.axesStatus[0]) != 'undefined'){
-                object.xmom += (gamepadAPI.axesStatus[0] * speed)
-                object.ymom += (gamepadAPI.axesStatus[1] * speed)
+                object.xmom += (gamepadAPI.axesStatus[0] * speed/5)
+                object.ymom += (gamepadAPI.axesStatus[1] * speed/10)
                 }
             }
         }
@@ -1065,7 +1065,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         this.eggs[t].albumen[k].anchor.ymom -=.15
                         if(this.eggs[t].albumen[k].anchor.x > this.edge1.x || this.eggs[t].albumen[k].anchor.x < this.edge2.x  ){
                             if(this.eggs[t].albumen[k].anchor.x < this.edge2.x){
-                                if(this.eggs[t].albumen[k].anchor.xmom<0){
+                                if(this.eggs[t].albumen[k].anchor.xmom<0 || this.eggs[t].albumen[k].body.xmom<0 ){
                                     this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*1.1
                                     this.eggs[t].albumen[k].anchor.xmom *= -1.3
                                 }
