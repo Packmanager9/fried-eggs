@@ -220,6 +220,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
         draw() {
             canvas_context.fillStyle = this.color
             canvas_context.fillRect(this.x, this.y, this.width, this.height)
+            canvas_context.strokeStyle = "black"
+            canvas_context.strokeRect(this.x, this.y, this.width, this.height)
         }
         move() {
             this.x += this.xmom
@@ -285,7 +287,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
                 if (this.y + this.radius > canvas.height) {
                     if (this.ymom > 0) {
-                        this.ymom *= -1
+                        // this.ymom *= -1
                     }
                 }
                 if (this.x - this.radius < 0) {
@@ -337,7 +339,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 }
                 if (this.y + this.radius > canvas.height) {
                     if (this.ymom > 0) {
-                        this.ymom *= -1
+                        // this.ymom *= -1
                     }
                 }
                 if (this.x - this.radius < 0) {
@@ -558,6 +560,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
         move() {
             this.anchor.ymom += this.gravity
+            this.anchor.xmom*=.99
+            this.anchor.ymom*=.99
+            this.anchor.reflect = 1
             this.anchor.move()
         }
 
@@ -923,25 +928,48 @@ window.addEventListener('DOMContentLoaded', (event) => {
             for (let t = 0; t < limit; t++) {
                 let circ = new Circle((from.x * (t / limit)) + (to.x * ((limit - t) / limit)), (from.y * (t / limit)) + (to.y * ((limit - t) / limit)), radius, "red")
                 shape_array.push(circ)
+                // circ.draw()
             }
             return (new Shape(shape_array))
     }
 
     class Egg{
         constructor(){
-            this.body = new Circle(350,350, 12, "#FFDD00",0 ,0 , .99)
+            this.body = new Circle(350,350, 12, "#FFDD00",0 ,0 , .99, 1)
             this.albumen = []
-            this.leftspring = new Spring(349, 350, 11, "white", this.body, 4, .05)
-            this.rightspring = new Spring(351, 350, 11, "white", this.body,4, .05)
+            this.leftspring = new Spring(349, 350, 11, "white", this.body, 4, .05,1,1)
+            this.rightspring = new Spring(351, 350, 11, "white", this.body,4, .05,1,1)
             this.albumen.push(this.leftspring)
             this.albumen.push(this.rightspring)
             this.marked = 0
             for(let t = 0;t<8;t++){
-                this.leftspring = new Spring(349-t, 350, 11-t, "white", this.leftspring.anchor,4, .05)
-                this.rightspring = new Spring(351+t, 350, 11-t, "white", this.rightspring.anchor,4, .05)
+                this.leftspring = new Spring(349-t, 350, 11-t, "white", this.leftspring.anchor,4, .05,1,1)
+                this.rightspring = new Spring(351+t, 350, 11-t, "white", this.rightspring.anchor,4, .05,1,1)
                 this.albumen.push(this.leftspring)
                 this.albumen.push(this.rightspring)
             }
+        }
+        flip(){
+            for(let t = 0;t<this.albumen.length;t++){
+                if(this.albumen[t].body.ymom <0){
+                    this.albumen[t].body.ymom*=-1
+                }
+                if(this.albumen[t].anchor.ymom <0){
+                    this.albumen[t].anchor.ymom*=-1
+                }
+            }
+            this.body.ymom*=-1
+        }
+        flop(){
+            for(let t = 0;t<this.albumen.length;t++){
+                if(this.albumen[t].body.ymom >0){
+                    this.albumen[t].body.ymom*=-1
+                }
+                if(this.albumen[t].anchor.ymom >0){
+                    this.albumen[t].anchor.ymom*=-1
+                }
+            }
+            this.body.ymom*=-1
         }
         draw(){
             if(this.marked == 1){
@@ -976,7 +1004,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     class Pan{
         constructor(){
-            this.body = new Circle(350,350,1, "red")
+            this.body = new Circle(350,500,1, "red")
             this.edge1 =new Point(500,500)
             this.edge2 =new Point(500,200)
             this.edge3 = new Point(480,180)
@@ -995,6 +1023,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
         draw(){
             control(this.body, 6 )
+            if(this.body.y < 350){
+                this.body.y = 350
+            }
             gamepad_control(this.body,6)
             this.edge1.x = this.body.x+150
             this.edge2.x = this.body.x-150
@@ -1011,9 +1042,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.eggs[t].draw()
             }
             this.frytemp = []
-            this.frytemp.push(castBetween(this.edge1, this.edge2, 300, 15))
-            this.frytemp.push(castBetween(this.edge1, this.edge4, 50,15))
-            this.frytemp.push(castBetween(this.edge3, this.edge2, 50,15))
+            this.frytemp.push(castBetween(this.edge1, this.edge2, 30, 15))
+            this.frytemp.push(castBetween(this.edge1, this.edge4, 5,15))
+            this.frytemp.push(castBetween(this.edge3, this.edge2, 5,15))
             this.frying = new Shape(this.frytemp)
             // console.log(this.frying)
 
@@ -1021,9 +1052,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             for(let k = 0;k<this.eggs.length;k++){
                 if(t!= k){
-                    if(Math.abs(this.eggs[t].body.x-this.eggs[k].body.x) < 120){
-                        this.eggs[t].body.xmom +=(this.eggs[t].body.x-this.eggs[k].body.x)/100
-                    }else if((Math.abs(this.eggs[t].body.x-this.eggs[k].body.x)> 120 && Math.abs(this.eggs[t].body.x-this.eggs[k].body.x) < 220)){
+                    if(Math.abs(this.eggs[t].body.x-this.eggs[k].body.x) < 100){
+                        this.eggs[t].body.xmom +=(this.eggs[t].body.x-this.eggs[k].body.x)/300
+                    }else if((Math.abs(this.eggs[t].body.x-this.eggs[k].body.x)> 100 && Math.abs(this.eggs[t].body.x-this.eggs[k].body.x) < 150)){
                         this.eggs[t].body.xmom -=(this.eggs[t].body.x-this.eggs[k].body.x)/1000
                     }
                 } 
@@ -1043,15 +1074,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
           
                         if(this.eggs[t].albumen[k].body.x > this.edge1.x || this.eggs[t].albumen[k].body.x < this.edge2.x  ){
                             if(this.eggs[t].albumen[k].body.x < this.edge2.x){
-                                if(this.eggs[t].albumen[k].body.xmom<0){
-                                    this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*1.1
-                                    this.eggs[t].albumen[k].body.xmom *= -1.3
+                                if(this.eggs[t].albumen[k].anchor.xmom<0 || this.eggs[t].albumen[k].body.xmom<0 ){
+                                    this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*2.1
+                                    this.eggs[t].albumen[k].body.xmom *= -1.5
+                                    console.log('f1')
                                 }
                             }
                             if(this.eggs[t].albumen[k].body.x > this.edge1.x){
-                                if(this.eggs[t].albumen[k].body.xmom>0){
-                                    this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*1.1
-                                    this.eggs[t].albumen[k].body.xmom *= -1.3
+                                if(this.eggs[t].albumen[k].anchor.xmom>0 || this.eggs[t].albumen[k].body.xmom>0 ){
+                                    this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*2.1
+                                    this.eggs[t].albumen[k].body.xmom *= -1.5
+                                    console.log('f2')
                                 }
                             }
                         }
@@ -1063,21 +1096,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if(this.eggs[t].albumen[k].anchor.ymom > 0){
                         this.eggs[t].albumen[k].anchor.ymom *= -.1
                         this.eggs[t].albumen[k].anchor.ymom -=.15
-                        if(this.eggs[t].albumen[k].anchor.x > this.edge1.x || this.eggs[t].albumen[k].anchor.x < this.edge2.x  ){
-                            if(this.eggs[t].albumen[k].anchor.x < this.edge2.x){
-                                if(this.eggs[t].albumen[k].anchor.xmom<0 || this.eggs[t].albumen[k].body.xmom<0 ){
-                                    this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*1.1
-                                    this.eggs[t].albumen[k].anchor.xmom *= -1.3
-                                }
-                            }
-                            if(this.eggs[t].albumen[k].anchor.x > this.edge1.x){
-                                if(this.eggs[t].albumen[k].anchor.xmom>0){
-                                    this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*1.1
-                                    this.eggs[t].albumen[k].anchor.xmom *= -1.3
-                                }
+                        this.eggs[t].marked = 1
+                    }
+
+                    if(this.eggs[t].albumen[k].anchor.x > this.edge1.x || this.eggs[t].albumen[k].anchor.x < this.edge2.x  ){
+                        if(this.eggs[t].albumen[k].anchor.x < this.edge2.x){
+                            if(this.eggs[t].albumen[k].anchor.xmom<0 || this.eggs[t].albumen[k].body.xmom<0 ){
+                                this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*2.1
+                                this.eggs[t].albumen[k].anchor.xmom *= -1.5
+                                console.log('f3')
                             }
                         }
-                        this.eggs[t].marked = 1
+                        if(this.eggs[t].albumen[k].anchor.x > this.edge1.x){
+                            if(this.eggs[t].albumen[k].anchor.xmom>0 || this.eggs[t].albumen[k].body.xmom>0 ){
+                                this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*2.1
+                                this.eggs[t].albumen[k].anchor.xmom *= -1.5
+                                console.log('f4')
+                            }
+                        }
                     }
                 }
             }
@@ -1096,6 +1132,43 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     // object instantiation and creation happens here 
 
+    class Bricks{
+        constructor(){
+            this.grid = []
+            this.x = 0
+            this.y = 0
+            for(let t = 0;t<100;t++){
+                let brick = new Rectangle(this.x, this.y, 70, 14, "pink")
+                this.x+=brick.width
+                if(this.x>= canvas.width){
+                    this.x=0
+                    this.y+=brick.height
+                }
+                this.grid.push(brick)
+            }
+        }
+        draw(){
+            for(let t = 0;t<this.grid.length;t++){
+                this.grid[t].draw()
+            }
+            for(let t = 0;t<this.grid.length;t++){
+                for(let k = 0;k<pan.eggs.length;k++){
+                    if(this.grid[t].doesPerimeterTouch(pan.eggs[k].body)){
+                        if(this.grid[t].y<pan.eggs[k].body.y){
+                            pan.eggs[k].flip()
+                        }
+                        if(this.grid[t].y>pan.eggs[k].body.y){
+                            pan.eggs[k].flop()
+                        }
+                        this.grid.splice(t,1)
+                        break
+                    }
+                }
+            }
+
+        }
+    }
+    let bricks = new Bricks()
 
 
     function main() {
@@ -1103,5 +1176,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
         gamepadAPI.update() //checks for button presses/stick movement on the connected controller)
         // game code goes here
         pan.draw()
+        bricks.draw()
     }
 })
