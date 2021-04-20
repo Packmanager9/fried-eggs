@@ -764,13 +764,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.ray = []
         }
     }
-    function setUp(canvas_pass, style = "#000000") {
+    function setUp(canvas_pass, style = "#AAAAFF") {
         canvas = canvas_pass
         canvas_context = canvas.getContext('2d');
         canvas.style.background = style
         window.setInterval(function () {
             main()
-        }, 17)
+        }, 34)
         document.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
         });
@@ -929,16 +929,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     class Egg{
         constructor(){
-            this.body = new Circle(350,350, 10, "#FFDD00",0 ,0 , .99)
+            this.body = new Circle(350,350, 12, "#FFDD00",0 ,0 , .99)
             this.albumen = []
-            this.leftspring = new Spring(349, 350, 3, "white", this.body, 4, .05)
-            this.rightspring = new Spring(351, 350, 3, "white", this.body,4, .05)
+            this.leftspring = new Spring(349, 350, 11, "white", this.body, 4, .05)
+            this.rightspring = new Spring(351, 350, 11, "white", this.body,4, .05)
             this.albumen.push(this.leftspring)
             this.albumen.push(this.rightspring)
             this.marked = 0
             for(let t = 0;t<8;t++){
-                this.leftspring = new Spring(349-t, 350, 3, "white", this.leftspring.anchor,4, .05)
-                this.rightspring = new Spring(351+t, 350, 3, "white", this.rightspring.anchor,4, .05)
+                this.leftspring = new Spring(349-t, 350, 11-t, "white", this.leftspring.anchor,4, .05)
+                this.rightspring = new Spring(351+t, 350, 11-t, "white", this.rightspring.anchor,4, .05)
                 this.albumen.push(this.leftspring)
                 this.albumen.push(this.rightspring)
             }
@@ -1000,9 +1000,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.edge2.x = this.body.x-150
             this.edge1.y = this.body.y+150
             this.edge2.y = this.body.y+150
-            this.edge3.y = this.body.y+110
+            this.edge3.y = this.body.y+90
             this.edge3.x = this.body.x-190
-            this.edge4.y = this.body.y+110
+            this.edge4.y = this.body.y+90
             this.edge4.x = this.body.x+190
             let link = new LineOP(this.edge1, this.edge2, "gray", 23)
             let link2 = new LineOP(this.edge3, this.edge2, "gray", 23)
@@ -1012,8 +1012,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             this.frytemp = []
             this.frytemp.push(castBetween(this.edge1, this.edge2, 300, 15))
-            this.frytemp.push(castBetween(this.edge1, this.edge4, 300,15))
-            this.frytemp.push(castBetween(this.edge3, this.edge2, 300,15))
+            this.frytemp.push(castBetween(this.edge1, this.edge4, 50,15))
+            this.frytemp.push(castBetween(this.edge3, this.edge2, 50,15))
             this.frying = new Shape(this.frytemp)
             // console.log(this.frying)
 
@@ -1044,12 +1044,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if(this.eggs[t].albumen[k].body.x > this.edge1.x || this.eggs[t].albumen[k].body.x < this.edge2.x  ){
                             if(this.eggs[t].albumen[k].body.x < this.edge2.x){
                                 if(this.eggs[t].albumen[k].body.xmom<0){
-                                    this.eggs[t].albumen[k].body.xmom *= -1
+                                    this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*1.1
+                                    this.eggs[t].albumen[k].body.xmom *= -1.3
                                 }
                             }
                             if(this.eggs[t].albumen[k].body.x > this.edge1.x){
                                 if(this.eggs[t].albumen[k].body.xmom>0){
-                                    this.eggs[t].albumen[k].body.xmom *= -1
+                                    this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*1.1
+                                    this.eggs[t].albumen[k].body.xmom *= -1.3
                                 }
                             }
                         }
@@ -1064,12 +1066,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if(this.eggs[t].albumen[k].anchor.x > this.edge1.x || this.eggs[t].albumen[k].anchor.x < this.edge2.x  ){
                             if(this.eggs[t].albumen[k].anchor.x < this.edge2.x){
                                 if(this.eggs[t].albumen[k].anchor.xmom<0){
-                                    this.eggs[t].albumen[k].anchor.xmom *= -1
+                                    this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*1.1
+                                    this.eggs[t].albumen[k].anchor.xmom *= -1.3
                                 }
                             }
                             if(this.eggs[t].albumen[k].anchor.x > this.edge1.x){
                                 if(this.eggs[t].albumen[k].anchor.xmom>0){
-                                    this.eggs[t].albumen[k].anchor.xmom *= -1
+                                    this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*1.1
+                                    this.eggs[t].albumen[k].anchor.xmom *= -1.3
                                 }
                             }
                         }
