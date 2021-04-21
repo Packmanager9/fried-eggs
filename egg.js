@@ -54,7 +54,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             gamepadAPI.axesStatus = axes;// assign received values
             gamepadAPI.buttonsStatus = pressed;
-            // console.log(pressed); // return buttons for debugging purposes
+            // //console.log(pressed); // return buttons for debugging purposes
             return pressed;
         },
         buttonPressed: function (button, hold) {
@@ -216,12 +216,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.stroke = stroke
             this.strokeWidth = strokeWidth
             this.fill = fill
+            this.line = new Line(this.x,this.y+(Math.random()*this.height), this.x+this.width,this.y+(Math.random()*this.height), "brown", 1+(Math.random()*3))
+            this.line2 = new Line(this.x,this.y+(Math.random()*this.height), this.x+this.width,this.y+(Math.random()*this.height), "red", 1+(Math.random()*3))
+            this.line3 = new Line(this.x,this.y+(Math.random()*this.height), this.x+this.width,this.y+(Math.random()*this.height), "white", 1+(Math.random()*3))
         }
         draw() {
             canvas_context.fillStyle = this.color
             canvas_context.fillRect(this.x, this.y, this.width, this.height)
             canvas_context.strokeStyle = "black"
             canvas_context.strokeRect(this.x, this.y, this.width, this.height)
+            this.line.draw()
+            this.line2.draw()
+            this.line3.draw()
         }
         move() {
             this.x += this.xmom
@@ -275,7 +281,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 canvas_context.fill()
                 canvas_context.stroke();
             } else {
-                console.log("The circle is below a radius of 0, and has not been drawn. The circle is:", this)
+                //console.log("The circle is below a radius of 0, and has not been drawn. The circle is:", this)
             }
         }
         move() {
@@ -540,10 +546,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.anchor.xmom -= (this.body.x - this.anchor.x) / this.length
                 this.anchor.ymom -= (this.body.y - this.anchor.y) / this.length
             } else {
-                this.body.xmom -= (this.body.x - this.anchor.x) / this.length
-                this.body.ymom -= (this.body.y - this.anchor.y) / this.length
-                this.anchor.xmom += (this.body.x - this.anchor.x) / this.length
-                this.anchor.ymom += (this.body.y - this.anchor.y) / this.length
+                this.body.xmom -= (this.body.x - this.anchor.x) / (this.length/4)
+                this.body.ymom -= (this.body.y - this.anchor.y) / (this.length/4)
+                this.anchor.xmom += (this.body.x - this.anchor.x) / (this.length/4)
+                this.anchor.ymom += (this.body.y - this.anchor.y) / (this.length/4)
             }
             let xmomentumaverage = (this.body.xmom + this.anchor.xmom) / 2
             let ymomentumaverage = (this.body.ymom + this.anchor.ymom) / 2
@@ -555,7 +561,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         draw() {
             this.beam = new Line(this.body.x, this.body.y, this.anchor.x, this.anchor.y, "white", this.body.radius*2)
             this.beam.draw()
-            this.body.draw()
+            // this.body.draw()
             this.anchor.draw()
         }
         move() {
@@ -805,7 +811,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
     }
     function gamepad_control(object, speed = 1) { // basic control for objects using the controler
-        // console.log(gamepadAPI.axesStatus[1]*gamepadAPI.axesStatus[0])
+        // //console.log(gamepadAPI.axesStatus[1]*gamepadAPI.axesStatus[0])
         if (typeof object.body != 'undefined') {
             if(typeof (gamepadAPI.axesStatus[1]) != 'undefined'){
                 if(typeof (gamepadAPI.axesStatus[0]) != 'undefined'){
@@ -823,7 +829,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }
     }
     function vgamepad_control(object, speed = 1) { // basic control for objects using the controler
-        // console.log(gamepadAPI.axesStatus[1]*gamepadAPI.axesStatus[0])
+        // //console.log(gamepadAPI.axesStatus[1]*gamepadAPI.axesStatus[0])
         if (typeof object.body != 'undefined') {
             if(typeof (gamepadAPI.axesStatus[1]) != 'undefined'){
                 if(typeof (gamepadAPI.axesStatus[0]) != 'undefined'){
@@ -872,26 +878,26 @@ window.addEventListener('DOMContentLoaded', (event) => {
     function vcontrol(object, speed = 1) { // basic control for objects
         if (typeof object.body != 'undefined') {
             if (keysPressed['w']) {
-                object.body.ymom -= speed/5
+                object.body.ymom -= speed/-.6
             }
             if (keysPressed['d']) {
                 object.body.xmom += speed/10
             }
             if (keysPressed['s']) {
-                object.body.ymom += speed/5
+                object.body.ymom += speed/-.6
             }
             if (keysPressed['a']) {
                 object.body.xmom -= speed/10
             }
         } else if (typeof object != 'undefined') {
             if (keysPressed['w']) {
-                object.ymom -= speed/5
+                object.ymom -= speed/-.6
             }
             if (keysPressed['d']) {
                 object.xmom += speed/10
             }
             if (keysPressed['s']) {
-                object.ymom += speed/5
+                object.ymom += speed/-.6
             }
             if (keysPressed['a']) {
                 object.xmom -= speed/10
@@ -934,17 +940,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
     class Egg{
-        constructor(){
-            this.body = new Circle(350,350, 12, "#FFDD00",0 ,0 , .99, 1)
+        constructor(x,y){
+            this.cracked = 0
+            this.body = new Circle(x,y, 12, "#FFDD00",0 ,0 , .99, 1)
             this.albumen = []
-            this.leftspring = new Spring(349, 350, 11, "white", this.body, 4, .05,1,1)
-            this.rightspring = new Spring(351, 350, 11, "white", this.body,4, .05,1,1)
+            this.leftspring = new Spring(x-1, y, 11, "white", this.body, 4, .05,1,1)
+            this.rightspring = new Spring(x-1, y, 11, "white", this.body,4, .05,1,1)
             this.albumen.push(this.leftspring)
             this.albumen.push(this.rightspring)
             this.marked = 0
             for(let t = 0;t<8;t++){
-                this.leftspring = new Spring(349-t, 350, 11-t, "white", this.leftspring.anchor,4, .05,1,1)
-                this.rightspring = new Spring(351+t, 350, 11-t, "white", this.rightspring.anchor,4, .05,1,1)
+                this.leftspring = new Spring(x-1-t, y, 11-t, "white", this.leftspring.anchor,4, .05,1,1)
+                this.rightspring = new Spring(x+1+t, y, 11-t, "white", this.rightspring.anchor,4, .05,1,1)
                 this.albumen.push(this.leftspring)
                 this.albumen.push(this.rightspring)
             }
@@ -972,34 +979,71 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.body.ymom*=-1
         }
         draw(){
+            if(this.cracked == 0){
+                this.body.radius = 20
+                this.body.color = "#FFFFDD"
             if(this.marked == 1){
-            control(this.body, 6 )
-            gamepad_control(this.body,6)
-            }
-            this.body.ymom += .5
-            this.body.frictiveMove()
-            for(let t =0;t<this.albumen.length;t++){
-                this.albumen[t].balance()
-            }
-            for(let t =0;t<this.albumen.length;t++){
-                for(let k =0;k<this.albumen.length;k++){
-                    if(t!= k){
-                        this.albumen[t].body.xmom += (this.albumen[t].body.x - this.albumen[k].body.x)/7000
+                control(this.body, 6 )
+                gamepad_control(this.body,6)
+                }
+                // this.body.ymom += .5
+                this.body.frictiveMove()
+                for(let t =0;t<this.albumen.length;t++){
+                    this.albumen[t].balance()
+                }
+                for(let t =0;t<this.albumen.length;t++){
+                    for(let k =0;k<this.albumen.length;k++){
+                        if(t!= k){
+                            this.albumen[t].body.xmom += (this.albumen[t].body.x - this.albumen[k].body.x)/1000
+                        }
                     }
                 }
-            }
-            for(let t =0;t<this.albumen.length;t++){
-                this.albumen[t].move()
-                if(this.marked == 1){
-                vcontrol(this.albumen[t].anchor,6)
-                vgamepad_control(this.albumen[t].anchor,6)
+
+                for(let t =0;t<this.albumen.length;t++){
+                    this.albumen[t].move()
+                    if(this.marked == 1){
+                    vcontrol(this.albumen[t].anchor,-1)
+                    vgamepad_control(this.albumen[t].anchor,-1)
+                    }
                 }
+                for(let t =0;t<this.albumen.length;t++){
+                    // this.albumen[t].draw()
+                }
+                this.marked = 0
+                this.body.draw()
+            }else{
+
+                this.body.color = "#FFDD00"
+                this.body.radius = 12
+                if(this.marked == 1){
+                    control(this.body, 7)
+                    gamepad_control(this.body,7)
+                    }
+                    this.body.ymom += .5
+                    this.body.frictiveMove()
+                    for(let t =0;t<this.albumen.length;t++){
+                        this.albumen[t].balance()
+                    }
+                    for(let t =0;t<this.albumen.length;t++){
+                        for(let k =0;k<this.albumen.length;k++){
+                            if(t!= k){
+                                this.albumen[t].body.xmom += (this.albumen[t].body.x - this.albumen[k].body.x)/1000
+                            }
+                        }
+                    }
+                    for(let t =0;t<this.albumen.length;t++){
+                        this.albumen[t].move()
+                        if(this.marked == 1){
+                        vcontrol(this.albumen[t].anchor,-1)
+                        vgamepad_control(this.albumen[t].anchor,-1)
+                        }
+                    }
+                    for(let t =0;t<this.albumen.length;t++){
+                        this.albumen[t].draw()
+                    }
+                    this.marked = 0
+                    this.body.draw()
             }
-            for(let t =0;t<this.albumen.length;t++){
-                this.albumen[t].draw()
-            }
-            this.marked = 0
-            this.body.draw()
         }
     }
     class Pan{
@@ -1011,9 +1055,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.edge4 = new Point(480,520)
             this.flat = new Line
             this.eggs = []
-            for(let t = 0;t<3;t++){
+            for(let t = 0;t<1;t++){
 
-                let egg = new Egg()
+                let egg = new Egg(300+(50*t), 350)
                 egg.body.x+=((Math.random()-.5)*70)
                 this.eggs.push(egg)
 
@@ -1022,9 +1066,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.frytemp = []
         }
         draw(){
-            control(this.body, 6 )
-            if(this.body.y < 350){
-                this.body.y = 350
+            control(this.body, 7 )
+            if(this.body.y < 250){
+                this.body.y = 250
             }
             gamepad_control(this.body,6)
             this.edge1.x = this.body.x+150
@@ -1043,10 +1087,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
             this.frytemp = []
             this.frytemp.push(castBetween(this.edge1, this.edge2, 30, 15))
-            this.frytemp.push(castBetween(this.edge1, this.edge4, 5,15))
-            this.frytemp.push(castBetween(this.edge3, this.edge2, 5,15))
+            this.frytemp.push(castBetween(this.edge1, this.edge4, 15,15))
+            this.frytemp.push(castBetween(this.edge3, this.edge2, 15,15))
             this.frying = new Shape(this.frytemp)
-            // console.log(this.frying)
+            // //console.log(this.frying)
 
             for(let t = 0;t<this.eggs.length;t++){
 
@@ -1063,6 +1107,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             
             for(let t = 0;t<this.eggs.length;t++){
                 if(this.frying.doesPerimeterTouch(this.eggs[t].body)){
+                    this.eggs[t].cracked =1
                     if(this.eggs[t].body.ymom < 0){
                     this.eggs[t].body.ymom *= -1
                     }
@@ -1072,22 +1117,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     if(this.eggs[t].albumen[k].body.ymom > 0){
                         this.eggs[t].albumen[k].body.ymom *= -.1
           
-                        if(this.eggs[t].albumen[k].body.x > this.edge1.x || this.eggs[t].albumen[k].body.x < this.edge2.x  ){
+                        // if(this.eggs[t].albumen[k].body.x > this.edge1.x || this.eggs[t].albumen[k].body.x < this.edge2.x  ){
                             if(this.eggs[t].albumen[k].body.x < this.edge2.x){
                                 if(this.eggs[t].albumen[k].anchor.xmom<0 || this.eggs[t].albumen[k].body.xmom<0 ){
                                     this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*2.1
                                     this.eggs[t].albumen[k].body.xmom *= -1.5
-                                    console.log('f1')
+                                    //console.log('f1')
                                 }
                             }
                             if(this.eggs[t].albumen[k].body.x > this.edge1.x){
                                 if(this.eggs[t].albumen[k].anchor.xmom>0 || this.eggs[t].albumen[k].body.xmom>0 ){
                                     this.eggs[t].albumen[k].body.ymom = -Math.abs(this.eggs[t].albumen[k].body.xmom )*2.1
                                     this.eggs[t].albumen[k].body.xmom *= -1.5
-                                    console.log('f2')
+                                    //console.log('f2')
                                 }
                             }
-                        }
+                        // }
                     this.eggs[t].albumen[k].body.ymom -=.5
                     this.eggs[t].marked = 1
                     }
@@ -1099,29 +1144,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         this.eggs[t].marked = 1
                     }
 
-                    if(this.eggs[t].albumen[k].anchor.x > this.edge1.x || this.eggs[t].albumen[k].anchor.x < this.edge2.x  ){
+                    // if(this.eggs[t].albumen[k].anchor.x > this.edge1.x || this.eggs[t].albumen[k].anchor.x < this.edge2.x  ){
                         if(this.eggs[t].albumen[k].anchor.x < this.edge2.x){
                             if(this.eggs[t].albumen[k].anchor.xmom<0 || this.eggs[t].albumen[k].body.xmom<0 ){
                                 this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*2.1
                                 this.eggs[t].albumen[k].anchor.xmom *= -1.5
-                                console.log('f3')
+                                //console.log('f3')
                             }
                         }
                         if(this.eggs[t].albumen[k].anchor.x > this.edge1.x){
                             if(this.eggs[t].albumen[k].anchor.xmom>0 || this.eggs[t].albumen[k].body.xmom>0 ){
                                 this.eggs[t].albumen[k].anchor.ymom = -Math.abs(this.eggs[t].albumen[k].anchor.xmom )*2.1
                                 this.eggs[t].albumen[k].anchor.xmom *= -1.5
-                                console.log('f4')
+                                //console.log('f4')
                             }
                         }
-                    }
+                    // }
                 }
             }
             }
             link.draw()
             link2.draw()
             link3.draw()
-            this.body.draw()
+            // this.body.draw()
         }
     }
     let pan = new Pan()
@@ -1135,10 +1180,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
     class Bricks{
         constructor(){
             this.grid = []
+            this.links = []
             this.x = 0
             this.y = 0
             for(let t = 0;t<100;t++){
-                let brick = new Rectangle(this.x, this.y, 70, 14, "pink")
+                let brick = new Rectangle(this.x, this.y, 70, 14, "#FF8888")
                 this.x+=brick.width
                 if(this.x>= canvas.width){
                     this.x=0
@@ -1151,6 +1197,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
             for(let t = 0;t<this.grid.length;t++){
                 this.grid[t].draw()
             }
+            for(let t = 0;t<this.links.length;t++){
+                this.links[t].draw()
+            }
             for(let t = 0;t<this.grid.length;t++){
                 for(let k = 0;k<pan.eggs.length;k++){
                     if(this.grid[t].doesPerimeterTouch(pan.eggs[k].body)){
@@ -1160,7 +1209,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if(this.grid[t].y>pan.eggs[k].body.y){
                             pan.eggs[k].flop()
                         }
+                        if(Math.random()<.1){
+                            let egg = new Egg(this.grid[t].x, this.grid[t].y )
+                            pan.eggs.push(egg)
+                        }
                         this.grid.splice(t,1)
+                        this.links.splice(t,1)
                         break
                     }
                 }
@@ -1179,3 +1233,4 @@ window.addEventListener('DOMContentLoaded', (event) => {
         bricks.draw()
     }
 })
+
